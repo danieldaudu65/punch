@@ -1,0 +1,168 @@
+# Quick manual checks. Open in VS Code with the "REST Client" extension
+# and click "Send Request" above each block. Cookies are kept between requests.
+
+@api = http://localhost:4000/api
+
+### Health check
+GET {{api}}/health
+
+### Register a fictitious student
+POST {{api}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Ada Test",
+  "email": "ada.test@example.com",
+  "password": "password123"
+}
+
+### Register again with the same email (expect 409)
+POST {{api}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Ada Again",
+  "email": "ada.test@example.com",
+  "password": "password123"
+}
+
+### Invalid body (expect 400 with field details)
+POST {{api}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "A",
+  "email": "not-an-email",
+  "password": "short"
+}
+
+### Wrong password (expect 401)
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ada.test@example.com",
+  "password": "wrong-password"
+}
+
+### Login
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ada.test@example.com",
+  "password": "password123"
+}
+
+### Who am I (needs the cookie from login)
+GET {{api}}/auth/me
+
+### Logout
+POST {{api}}/auth/logout
+
+### Who am I after logout (expect 401)
+GET {{api}}/auth/me
+
+
+# ───────── Session 2: quizzes and attempts ─────────
+# Run "npm run seed" once first. Then log in again with the request above.
+
+### List quizzes (answers are never included)
+# @name quizzes
+GET {{api}}/quizzes
+
+### Start the first quiz (201 new, 200 if resuming an open attempt)
+# @name start
+POST {{api}}/quizzes/{{quizzes.response.body.$.data.quizzes[0].id}}/attempts
+
+### Submit answers (all option 1 here; some will be wrong, that's fine)
+# @name submit
+POST {{api}}/attempts/{{start.response.body.$.data.attemptId}}/submit
+Content-Type: application/json
+
+{
+  "answers": [
+    { "questionKey": "naija-01", "selectedIndex": 1 },
+    { "questionKey": "naija-02", "selectedIndex": 1 },
+    { "questionKey": "naija-03", "selectedIndex": 1 },
+    { "questionKey": "naija-04", "selectedIndex": 1 },
+    { "questionKey": "naija-05", "selectedIndex": 1 },
+    { "questionKey": "naija-06", "selectedIndex": 1 },
+    { "questionKey": "naija-07", "selectedIndex": 1 },
+    { "questionKey": "naija-08", "selectedIndex": 1 },
+    { "questionKey": "naija-09", "selectedIndex": 1 },
+    { "questionKey": "naija-10", "selectedIndex": 1 }
+  ]
+}
+
+### Submit the SAME attempt again (expect 409, no extra XP)
+POST {{api}}/attempts/{{start.response.body.$.data.attemptId}}/submit
+Content-Type: application/json
+
+{ "answers": [] }
+
+### Check XP did not change after the duplicate
+GET {{api}}/auth/me
+
+### Retake: start the same quiz again (expect isPractice: true)
+# @name retake
+POST {{api}}/quizzes/{{quizzes.response.body.$.data.quizzes[0].id}}/attempts
+
+### Submit the retake (expect xpAwarded: 0)
+POST {{api}}/attempts/{{retake.response.body.$.data.attemptId}}/submit
+Content-Type: application/json
+
+{ "answers": [{ "questionKey": "naija-01", "selectedIndex": 1 }] }
+
+### View a past result with the answer review
+GET {{api}}/attempts/{{start.response.body.$.data.attemptId}}
+
+### My attempt history
+GET {{api}}/attempts
+
+### Invalid: question from another quiz (expect 400)
+# Start a fresh attempt first with the request above, then send this.
+POST {{api}}/attempts/{{start.response.body.$.data.attemptId}}/submit
+Content-Type: application/json
+
+{ "answers": [{ "questionKey": "money-01", "selectedIndex": 0 }] }
+
+### Invalid: malformed id (expect 400)
+POST {{api}}/attempts/not-a-real-id/submit
+Content-Type: application/json
+
+{ "answers": [] }
+
+### Invalid: no session cookie would give 401 (try after logout)
+GET {{api}}/quizzes
+
+
+# ───────── Session 3: dashboard, leaderboard, badges ─────────
+# "npm run seed" now also creates 8 fictitious demo students and a demo login.
+
+### Log in as the demo account (created by the seed)
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "demo@example.com",
+  "password": "DemoPass123"
+}
+
+### Dashboard: name, XP, level, quizzes done, rank, all badges, recent attempts
+GET {{api}}/dashboard
+
+### Leaderboard: top 10 plus your own row ("me"), no emails exposed
+GET {{api}}/leaderboard
+
+### Leaderboard with a custom size
+GET {{api}}/leaderboard?limit=3
+
+### Invalid leaderboard size (expect 400)
+GET {{api}}/leaderboard?limit=500
+
+### All badges and how to earn them
+GET {{api}}/badges
+
+### Unknown API route (expect 404, not 401)
+GET {{api}}/does-not-exist

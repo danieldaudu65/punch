@@ -1,0 +1,116 @@
+/*
+ * The 3D XP coin. Real thickness comes from a stack of edge discs between
+ * the front and back faces, so tilting it shows a solid gold rim.
+ * Sizes are relative to --size so one component works from 120px to 320px.
+ */
+
+.medallion {
+  --size: 260px;
+  --depth: 24px;
+
+  position: relative;
+  width: var(--size);
+  height: calc(var(--size) * 1.18);
+  perspective: 900px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.medallion__float,
+.medallion__spin,
+.medallion__coin {
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: var(--size);
+  height: var(--size);
+  transform-style: preserve-3d;
+}
+
+.medallion__edge,
+.medallion__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  backface-visibility: hidden;
+}
+
+.medallion__edge {
+  backface-visibility: visible;
+  background: linear-gradient(90deg, var(--gold-edge) 0%, #e3a21c 45%, #f6c656 55%, var(--gold-edge) 100%);
+}
+
+.medallion__face--front {
+  transform: translateZ(calc(var(--depth) / 2 + 0.5px));
+  background: radial-gradient(
+    circle at 34% 28%,
+    var(--gold-light) 0%,
+    var(--gold) 36%,
+    #d9920f 70%,
+    #a36607 100%
+  );
+  box-shadow:
+    inset 0 0 0 calc(var(--size) * 0.032) #f5b830,
+    inset 0 0 0 calc(var(--size) * 0.05) #a86c07,
+    inset 0 calc(var(--size) * -0.05) calc(var(--size) * 0.12) rgb(90 50 0 / 0.45);
+  overflow: hidden;
+}
+
+.medallion__face--back {
+  transform: rotateY(180deg) translateZ(calc(var(--depth) / 2 + 0.5px));
+  background: radial-gradient(circle at 60% 35%, #f3b43a, #b87708 75%);
+  box-shadow: inset 0 0 0 calc(var(--size) * 0.05) #a86c07;
+}
+
+/* Stamped inner ring with the bolt and the XP value */
+.medallion__ring {
+  position: absolute;
+  inset: 15%;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: calc(var(--size) * 0.01);
+  border-radius: 50%;
+  border: calc(var(--size) * 0.008) dashed rgb(122 74 0 / 0.5);
+  color: #7a4a00;
+}
+
+.medallion__glyph {
+  width: 50%;
+  height: 50%;
+  margin-bottom: -4%;
+  /* Embossed look: light edge on top, dark edge below */
+  filter: drop-shadow(0 1.5px 0 rgb(255 240 200 / 0.85)) drop-shadow(0 -1px 0 rgb(90 50 0 / 0.55));
+}
+
+.medallion__value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: calc(var(--size) * 0.12);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-shadow:
+    0 1.5px 0 rgb(255 240 200 / 0.85),
+    0 -1px 0 rgb(90 50 0 / 0.5);
+}
+
+/* A band of light that slides across the face as the coin tilts */
+.medallion__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(105deg, transparent 38%, rgb(255 255 255 / 0.55) 50%, transparent 62%);
+  background-size: 260% 100%;
+  mix-blend-mode: overlay;
+}
+
+/* Soft shadow on the "floor" that shrinks as the coin floats up */
+.medallion__shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 62%;
+  height: calc(var(--size) * 0.07);
+  margin-left: -31%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), transparent);
+}

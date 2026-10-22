@@ -1,0 +1,60 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ApiError, api } from '../../lib/api';
+import type { User } from '../../lib/types';
+
+export const currentUserKey = ['auth', 'me'] as const;
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
+export interface RegisterInput extends LoginInput {
+  name: string;
+}
+
+/** The logged-in student, or null when nobody is logged in. */
+export function useCurrentUser() {
+  return useQuery({
+    queryKey: currentUserKey,
+    queryFn: async () => {
+      try {
+        const { user } = await api<{ user: User }>('/auth/me');
+        return user;
+      } catch (err) {
+        // Not logged in is a normal state, not an error screen.
+        if (err instanceof ApiError && err.isUnauthorized) return null;
+        throw err;
+      }
+    },
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useLogin() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: LoginInput) => api<{ user: User }>('/auth/login', { method: 'POST', body: input }),
+    onSuccess: ({ user }) => queryClient.setQueryData(currentUserKey, user),
+  });
+}
+
+export function useRegister() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: RegisterInput) => api<{ user: User }>('/auth/register', { method: 'POST', body: input }),
+    onSuccess: ({ user }) => queryClient.setQueryData(currentUserKey, user),
+  });
+}
+
+export function useLogout() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api<void>('/auth/logout', { method: 'POST' }),
+    onSettled: () => {
+      // Drop every cached screen so the next student never sees the last one's data.
+      queryClient.clear();
+      queryClient.setQueryData(currentUserKey, null);
+    },
+  });
+}

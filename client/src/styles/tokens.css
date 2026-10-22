@@ -1,0 +1,57 @@
+/*
+ * Design tokens. Every colour has one job:
+ *   punch  = something you can press
+ *   gold   = rewards and XP, nothing else
+ *   mint   = correct, coral = wrong
+ */
+:root {
+  /* Night-indigo surfaces, darkest to lightest */
+  --ink-950: #08061a;
+  --ink-900: #0d0a1e;
+  --ink-800: #161229;
+  --ink-700: #211b3b;
+  --ink-600: #2e2752;
+  --ink-500: #4a4270;
+
+  --text: #f4f1ff;
+  --text-muted: #a9a2c9;
+  --text-faint: #746c99;
+
+  --punch: #e5262e;
+  --punch-bright: #ff3d44;
+  --punch-edge: #9b1219;
+
+  --gold: #ffc23c;
+  --gold-light: #ffe7a3;
+  --gold-deep: #c98a0b;
+  --gold-edge: #8a5505;
+
+  --mint: #2ee6a6;
+  --coral: #ff6b6b;
+  --violet: #8b7cff;
+
+  --font-display: 'Bricolage Grotesque', 'Figtree', system-ui, sans-serif;
+  --font-body: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Type scale (1.25 ratio) */
+  --text-xs: 0.8rem;
+  --text-sm: 0.9rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.563rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: 2.441rem;
+  --text-4xl: 3.052rem;
+
+  /* Radius grows with the size of the thing */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  /* Height of the pressable bottom edge on buttons and answer cards */
+  --press-depth: 5px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --page-gutter: clamp(16px, 4vw, 40px);
+}
