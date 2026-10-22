@@ -27,7 +27,7 @@ export function verifyToken(token: string): string | null {
 
 // httpOnly keeps the token away from JavaScript, so an XSS bug cannot steal it.
 // The frontend calls the API through the same domain (Vite proxy locally,
-// Vercel rewrite in production), which is why 'lax' is enough here.
+// Netlify proxy in production), which is why 'lax' is enough here.
 export const authCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: isProduction,

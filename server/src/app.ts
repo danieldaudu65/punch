@@ -10,14 +10,6 @@ import { attemptRouter } from './routes/attempt.routes';
 import { gamificationRouter } from './routes/gamification.routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
-// ===============================
-// DNS Configuration (optional)
-// ===============================
-const dnsPromises = require("node:dns/promises");
-const dns = require("dns");
-dnsPromises.setServers(["1.1.1.1", "8.8.8.8"]);
-dns.setDefaultResultOrder("ipv4first");
-
 // Kept separate from server.ts so tests can import the app without
 // opening a port or connecting to the real database.
 export function createApp() {

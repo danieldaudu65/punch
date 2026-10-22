@@ -4,7 +4,9 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { AlertTriangle, ArrowLeft, ArrowRight, Info, Timer, X } from 'lucide-react';
 import clsx from 'clsx';
 import { Button } from '../../components/Button';
+import { SoundToggle } from '../../components/SoundToggle';
 import { ApiError } from '../../lib/api';
+import { playSound } from '../../lib/sound';
 import type { QuizSession } from '../../lib/types';
 import { AnswerOption } from './AnswerOption';
 import { useSubmitAttempt } from './quiz.api';
@@ -12,6 +14,8 @@ import { formatClock, useCountdown } from './useCountdown';
 import { useSavedAnswers } from './useSavedAnswers';
 
 const LOW_TIME_SEC = 30;
+// The timer ticks audibly for the final seconds only.
+const TICK_FROM_SEC = 10;
 
 type Problem = { kind: 'expired' | 'error'; message: string } | null;
 
@@ -23,7 +27,7 @@ export function QuizRunner({ session, onRestart }: { session: QuizSession; onRes
   const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
   const submit = useSubmitAttempt();
-  const { answers, choose, clear } = useSavedAnswers(session.attemptId);
+  const { answers, choose: saveChoice, clear } = useSavedAnswers(session.attemptId);
 
   const questions = session.questions;
   const total = questions.length;
@@ -35,6 +39,11 @@ export function QuizRunner({ session, onRestart }: { session: QuizSession; onRes
   const submittedRef = useRef(false);
 
   const question = questions[index];
+
+  function choose(questionKey: string, optionIndex: number) {
+    playSound('select');
+    saveChoice(questionKey, optionIndex);
+  }
   const answeredCount = questions.filter((q) => answers[q.key] !== undefined).length;
   const isLast = index === total - 1;
 
@@ -43,6 +52,7 @@ export function QuizRunner({ session, onRestart }: { session: QuizSession; onRes
     if (submittedRef.current) return;
     submittedRef.current = true;
     setProblem(null);
+    playSound('submit');
 
     const payload = questions
       .filter((q) => answers[q.key] !== undefined)
@@ -60,11 +70,13 @@ export function QuizRunner({ session, onRestart }: { session: QuizSession; onRes
         return;
       }
       if (err instanceof ApiError && err.code === 'ATTEMPT_EXPIRED') {
+        playSound('timeUp');
         clear();
         setProblem({ kind: 'expired', message: err.message });
         return;
       }
       // Network or server trouble: let them try again with the same answers.
+      playSound('error');
       submittedRef.current = false;
       setProblem({
         kind: 'error',
@@ -74,19 +86,29 @@ export function QuizRunner({ session, onRestart }: { session: QuizSession; onRes
   }, [answers, clear, navigate, questions, session.attemptId, submit]);
 
   const secondsLeft = useCountdown(session.endsAt, () => {
+    playSound('timeUp');
     setTimeUp(true);
     void sendAnswers();
   });
 
+  useEffect(() => {
+    if (secondsLeft !== null && secondsLeft > 0 && secondsLeft <= TICK_FROM_SEC) playSound('tick');
+  }, [secondsLeft]);
+
   function goTo(nextIndex: number) {
+    playSound(nextIndex > index ? 'tap' : 'back');
     setDirection(nextIndex > index ? 1 : -1);
     setIndex(nextIndex);
     setReviewing(false);
   }
 
   function next() {
-    if (isLast) setReviewing(true);
-    else goTo(index + 1);
+    if (isLast) {
+      playSound('tap');
+      setReviewing(true);
+    } else {
+      goTo(index + 1);
+    }
   }
 
   // Keyboard: 1–4 or A–D to answer, arrows to move, Enter to continue.
@@ -145,6 +167,8 @@ export function QuizRunner({ session, onRestart }: { session: QuizSession; onRes
           <span>Leave</span>
         </Link>
         <p className="quiz-top__title">{session.quiz.title}</p>
+        <div className="quiz-top__right">
+        <SoundToggle />
         <p
           className={clsx('timer', lowTime && 'timer--low')}
           role="timer"
@@ -154,6 +178,7 @@ export function QuizRunner({ session, onRestart }: { session: QuizSession; onRes
           <Timer size={16} aria-hidden="true" />
           {secondsLeft === null ? '--:--' : formatClock(secondsLeft)}
         </p>
+        </div>
       </header>
 
       <ol className="progress-steps" aria-label={`${answeredCount} of ${total} answered`}>

@@ -1,4 +1,5 @@
 import { useAnimationControls, useReducedMotion } from 'framer-motion';
+import { playSound } from '../../lib/sound';
 
 /** A short side-to-side shake that answers a failed submit. */
 export function useShake() {
@@ -6,6 +7,7 @@ export function useShake() {
   const reduceMotion = useReducedMotion();
 
   function shake() {
+    playSound('error');
     if (reduceMotion) return;
     void controls.start({ x: [0, -10, 9, -6, 4, 0], transition: { duration: 0.42, ease: 'easeOut' } });
   }

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from '../../lib/api';
+import { playSound } from '../../lib/sound';
 import type { User } from '../../lib/types';
 
 export const currentUserKey = ['auth', 'me'] as const;
@@ -35,7 +36,10 @@ export function useLogin() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: LoginInput) => api<{ user: User }>('/auth/login', { method: 'POST', body: input }),
-    onSuccess: ({ user }) => queryClient.setQueryData(currentUserKey, user),
+    onSuccess: ({ user }) => {
+      playSound('success');
+      queryClient.setQueryData(currentUserKey, user);
+    },
   });
 }
 
@@ -43,7 +47,10 @@ export function useRegister() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: RegisterInput) => api<{ user: User }>('/auth/register', { method: 'POST', body: input }),
-    onSuccess: ({ user }) => queryClient.setQueryData(currentUserKey, user),
+    onSuccess: ({ user }) => {
+      playSound('success');
+      queryClient.setQueryData(currentUserKey, user);
+    },
   });
 }
 
@@ -52,6 +59,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: () => api<void>('/auth/logout', { method: 'POST' }),
     onSettled: () => {
+      playSound('back');
       // Drop every cached screen so the next student never sees the last one's data.
       queryClient.clear();
       queryClient.setQueryData(currentUserKey, null);

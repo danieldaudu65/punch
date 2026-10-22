@@ -12,6 +12,7 @@ import { ScoreRing } from '../features/results/ScoreRing';
 import { useCountUp } from '../hooks/useCountUp';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useMediaQuery } from '../hooks/useMediaQuery';
+import { playSound } from '../lib/sound';
 import type { AttemptResult, SubmitResult } from '../lib/types';
 
 // Attempts already celebrated in this tab. Going back to a result later
@@ -57,6 +58,22 @@ function ResultView({ result }: { result: AttemptResult }) {
     celebrated.add(result.attemptId);
   }, [result.attemptId]);
   const animate = celebrate && !reduceMotion;
+
+  // Sounds follow the same timeline as the animation: coin as the XP counts up,
+  // fanfare with the level-up banner, a sparkle as each badge flips in.
+  useEffect(() => {
+    if (!celebrate || !isFreshSubmit(result)) return;
+    const timeline = reduceMotion ? { xp: 0, level: 0.3, badge: 0.6, gap: 0.25 } : { xp: 0.9, level: 1.7, badge: 2, gap: 0.35 };
+    const timers: number[] = [];
+    const at = (seconds: number, sound: Parameters<typeof playSound>[0]) =>
+      timers.push(window.setTimeout(() => playSound(sound), seconds * 1000));
+
+    at(timeline.xp, result.isPractice || result.xpAwarded === 0 ? 'success' : 'coin');
+    if (result.leveledUp) at(timeline.level, 'levelUp');
+    result.newBadges.forEach((_, i) => at(timeline.badge + i * timeline.gap, 'badge'));
+
+    return () => timers.forEach((id) => window.clearTimeout(id));
+  }, [celebrate, reduceMotion, result]);
 
   const fresh = isFreshSubmit(result) ? result : null;
   const xpShown = useCountUp(result.xpAwarded, { enabled: animate, delay: 0.9, duration: 1.1 });

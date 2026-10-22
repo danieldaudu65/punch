@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { FloatingCoins } from '../components/FloatingCoins';
 import { Logo } from '../components/Logo';
 import { Medallion } from '../components/Medallion';
+import { SoundToggle } from '../components/SoundToggle';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 
 /**
@@ -17,6 +18,7 @@ export function AuthLayout() {
     <div className="auth">
       <header className="auth__top">
         <Logo to="/login" />
+        <SoundToggle />
       </header>
 
       <main className="auth__main">

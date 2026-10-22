@@ -3,8 +3,10 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { LayoutDashboard, LogOut, Trophy, type LucideIcon } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Logo } from '../components/Logo';
+import { SoundToggle } from '../components/SoundToggle';
 import { useCurrentUser, useLogout } from '../features/auth/auth.api';
 import { springSoft } from '../lib/motion';
+import { playSound } from '../lib/sound';
 
 const NAV_ITEMS: { to: string; label: string; icon: LucideIcon }[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -28,7 +30,7 @@ export function AppShell() {
 
           <nav className="shell__nav" aria-label="Main">
             {NAV_ITEMS.map((item) => (
-              <NavLink key={item.to} to={item.to} className="shell__link">
+              <NavLink key={item.to} to={item.to} className="shell__link" onClick={() => playSound('tap')}>
                 {({ isActive }) => (
                   <>
                     {/* One pill, shared between links: it glides to whichever is active. */}
@@ -53,6 +55,7 @@ export function AppShell() {
                 {user.xp.toLocaleString()} XP
               </motion.span>
             </span>
+            <SoundToggle />
             <span className="avatar" title={user.name} aria-hidden="true">
               {user.name.trim().charAt(0).toUpperCase()}
             </span>
@@ -84,7 +87,7 @@ export function AppShell() {
       {/* Phones: the same links as a bottom tab bar, within thumb reach. */}
       <nav className="tabbar" aria-label="Main">
         {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
-          <NavLink key={to} to={to} className="tabbar__link">
+          <NavLink key={to} to={to} className="tabbar__link" onClick={() => playSound('tap')}>
             {({ isActive }) => (
               <>
                 {isActive && <motion.span layoutId="tab-pill" className="tabbar__pill" transition={springSoft} />}

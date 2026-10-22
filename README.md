@@ -4,7 +4,7 @@ A mini quiz and rewards platform for young people: students register, take timed
 
 Built by **Daniel Success** for the PUNCH NextGen Full-Stack Web Developer pre-interview assessment.
 
-- **Live demo:** `https://YOUR-APP.vercel.app` *(replace after deploying)*
+- **Live demo:** `https://YOUR-APP.netlify.app` *(replace after deploying)*
 - **Demo login:** `demo@example.com` / `DemoPass123`, or use the "Explore with the demo account" button on the login page. All accounts and data are fictitious.
 
 ---
@@ -50,7 +50,7 @@ Built by **Daniel Success** for the PUNCH NextGen Full-Stack Web Developer pre-i
 | Motion | Framer Motion | Springs and sequenced animation for the 3D coin, quiz transitions and results celebration. |
 | Styling | Hand-written CSS with design tokens | A small token file where every colour has one job; no framework to configure. |
 | Tests | Vitest, Supertest, mongodb-memory-server | Real HTTP requests against a real, in-memory MongoDB replica set. |
-| Hosting | Render (API), Vercel (client), MongoDB Atlas | Free tiers; Vercel forwards `/api` to Render so cookies stay same-origin. |
+| Hosting | Render (API), Netlify (client), MongoDB Atlas | Free tiers; Netlify proxies `/api` to Render so cookies stay same-origin. |
 
 ---
 
@@ -192,7 +192,7 @@ The client needs no `.env`: Vite forwards `/api` to `localhost:4000`.
 | `CLIENT_ORIGIN` | No | Client URL for CORS. Default `http://localhost:5173` |
 | `PORT` | No | Default 4000 |
 | `NODE_ENV` | No | `development`, `test` or `production` |
-| `TRUST_PROXY_HOPS` | No | Proxies in front of the API. Default 1; 2 on Render behind Vercel |
+| `TRUST_PROXY_HOPS` | No | Proxies in front of the API. Default 1; 2 on Render behind Netlify |
 
 ---
 
@@ -220,10 +220,10 @@ API tests use an in-memory MongoDB replica set, so they run real transactions an
 ## Deployment
 
 1. **MongoDB Atlas:** under Network Access, allow `0.0.0.0/0` (Render's IPs change). Run `npm run seed` locally against the Atlas database once.
-2. **Render (API):** New → Blueprint → this repository. `render.yaml` sets the build, start command, health check and a generated `JWT_SECRET`. Enter `MONGODB_URI`, and set `CLIENT_ORIGIN` to the Vercel URL.
-3. **Vercel (client):** import the repository with **Root Directory** `client`. In `client/vercel.json`, replace `REPLACE-WITH-YOUR-RENDER-NAME` with the Render service name, then push.
+2. **Render (API):** New → Blueprint → this repository. `render.yaml` sets the build, start command, health check and a generated `JWT_SECRET`. Enter `MONGODB_URI`, and set `CLIENT_ORIGIN` to the Netlify URL.
+3. **Netlify (client):** in `client/netlify.toml`, replace `REPLACE-WITH-YOUR-RENDER-NAME` with the Render service name and push. Then in Netlify: Add new site → Import an existing project → this repository, with **Base directory** `client`. The build command and publish folder come from `netlify.toml`.
 
-Vercel forwards `/api/*` to Render, so the browser only ever talks to the Vercel domain. The session cookie is therefore first-party, which Safari and mobile browsers require.
+Netlify proxies `/api/*` to Render, so the browser only ever talks to the Netlify domain. The session cookie is therefore first-party, which Safari and mobile browsers require.
 
 ---
 
@@ -255,4 +255,13 @@ Vercel forwards `/api/*` to Render, so the browser only ever talks to the Vercel
 
 ## Use of AI assistance
 
-The assessment allows AI coding assistants with disclosure. I used **Claude (Anthropic)** as a coding assistant to help plan the architecture, generate and review code, write tests and draft this README. I reviewed, ran and tested the code, made the design and engineering decisions with it, and can explain every part of the submission.
+As the assessment allows, I used Claude (Anthropic) as an AI pair-programmer throughout this project, for planning, writing and reviewing code, writing tests and drafting this README. I set the direction, made the product and design decisions, and reviewed the work stage by stage.
+
+My contributions:
+
+- Broke the brief into a staged plan (server first, then client) and reviewed each stage before moving on.
+- Chose the stack and the product decisions: three Nigerian-themed quizzes, XP only on a first completion, five badges, a leaderboard with shared ranks.
+- Directed the visual identity and took it past the brief: the 3D coin, tilt cards, motion and sound effects.
+- Ran and tested the app locally, found bugs and got them fixed. For example, the demo login failed because the account only existed after seeding; it is now created automatically on startup.
+- Deployed the API to Render and the client to Netlify.
+- Can explain any part of the code, including the server-side scoring and the four layers of duplicate-reward protection.

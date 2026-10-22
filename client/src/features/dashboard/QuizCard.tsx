@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { BookOpen, CheckCircle2, Cpu, Landmark, ListChecks, Timer, Wallet, type LucideIcon } from 'lucide-react';
 import { TiltCard } from '../../components/TiltCard';
 import { minutesLabel } from '../../lib/format';
+import { playSound } from '../../lib/sound';
 import type { QuizListItem } from '../../lib/types';
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
@@ -56,12 +57,12 @@ export function QuizCard({ quiz }: { quiz: QuizListItem }) {
                 <CheckCircle2 size={16} aria-hidden="true" />
                 Best score {bestPercentage}%
               </p>
-              <Link to={`/quiz/${quiz.id}`} className="btn btn--quiet btn--small">
+              <Link to={`/quiz/${quiz.id}`} className="btn btn--quiet btn--small" onClick={() => playSound('tap')}>
                 Practise again
               </Link>
             </>
           ) : (
-            <Link to={`/quiz/${quiz.id}`} className="btn btn--primary btn--block">
+            <Link to={`/quiz/${quiz.id}`} className="btn btn--primary btn--block" onClick={() => playSound('tap')}>
               Start quiz
             </Link>
           )}

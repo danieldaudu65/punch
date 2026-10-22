@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     // The browser only ever talks to localhost:5173. Vite forwards /api to the
     // Express server, so the session cookie is same-origin, exactly like the
-    // Vercel rewrite in production.
+    // Netlify proxy in production.
     proxy: {
       '/api': { target: 'http://localhost:4000', changeOrigin: true },
     },

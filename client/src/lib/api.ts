@@ -38,7 +38,7 @@ function toFieldErrors(details: ApiErrorBody['error']['details']): Record<string
 
 /**
  * The only place the app calls fetch. Every request:
- * - goes to /api on the same origin (Vite proxy locally, Vercel rewrite in production),
+ * - goes to /api on the same origin (Vite proxy locally, Netlify proxy in production),
  * - sends the httpOnly session cookie,
  * - returns the `data` field on success or throws an ApiError.
  */
