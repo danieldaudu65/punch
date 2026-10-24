@@ -58,11 +58,13 @@ export function useLogout() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => api<void>('/auth/logout', { method: 'POST' }),
-    onSettled: () => {
+    onSettled: async () => {
       playSound('back');
-      // Drop every cached screen so the next student never sees the last one's data.
-      queryClient.clear();
+      await queryClient.cancelQueries();
+      // Mark nobody as logged in first, so the route guards react straight away.
       queryClient.setQueryData(currentUserKey, null);
+      // Then drop every other cached screen so the next student never sees this one's data.
+      queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== currentUserKey[0] });
     },
   });
 }

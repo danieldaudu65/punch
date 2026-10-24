@@ -26,12 +26,13 @@ export function verifyToken(token: string): string | null {
 }
 
 // httpOnly keeps the token away from JavaScript, so an XSS bug cannot steal it.
-// The frontend calls the API through the same domain (Vite proxy locally,
-// Netlify proxy in production), which is why 'lax' is enough here.
+// In production the cookie is SameSite=None and Secure so it still works if the
+// browser calls the API on another domain (Netlify site -> Render API).
+// Behind the Netlify proxy it is first-party anyway. Locally 'lax' is enough.
 export const authCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  sameSite: 'lax',
+  sameSite: isProduction ? 'none' : 'lax',
   path: '/',
   maxAge: SESSION_DAYS * 24 * 60 * 60 * 1000,
 };

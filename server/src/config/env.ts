@@ -6,7 +6,30 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
-  CLIENT_ORIGIN: z.string().url().default('http://localhost:5173'),
+  // One or more site URLs allowed to call the API, separated by commas.
+  // Trailing slashes are removed so "https://x.netlify.app/" still matches.
+  CLIENT_ORIGIN: z
+    .string()
+    .default('http://localhost:5173')
+    .transform((value) =>
+      value
+        .split(',')
+        .map((origin) => origin.trim().replace(/\/+$/, ''))
+        .filter(Boolean),
+    )
+    .refine(
+      (origins) =>
+        origins.length > 0 &&
+        origins.every((origin) => {
+          try {
+            new URL(origin);
+            return true;
+          } catch {
+            return false;
+          }
+        }),
+      'CLIENT_ORIGIN must be one or more valid URLs separated by commas',
+    ),
   // How many proxies sit in front of the app. Locally 0-1; on Render behind
   // the Netlify proxy it is 2 (Netlify, then Render's load balancer).
   // Getting this right makes the rate limiter see each student's real IP.

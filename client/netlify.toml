@@ -1,4 +1,4 @@
-# Netlify settings for the client. In Netlify, set Base directory to "client".
+# In Netlify set Base directory to "client". Build settings come from this file.
 
 [build]
   command = "npm run build"
@@ -7,16 +7,16 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# Forward API calls to the Render server. Status 200 makes this a proxy, not a
-# redirect, so the browser only ever talks to the Netlify domain and the
+# Forward API calls to the Render server. Status 200 makes this a proxy rather
+# than a redirect, so the browser only talks to the Netlify domain and the
 # session cookie stays first-party (needed for Safari and phones).
+# The same rules are in public/_redirects so they also apply to a manual deploy of dist/.
 [[redirects]]
   from = "/api/*"
-  to = "https://REPLACE-WITH-YOUR-RENDER-NAME.onrender.com/api/:splat"
+  to = "https://punch-gonf.onrender.com/api/:splat"
   status = 200
   force = true
 
-# Every other path loads the React app, so refreshing /dashboard works.
 [[redirects]]
   from = "/*"
   to = "/index.html"

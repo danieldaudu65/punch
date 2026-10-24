@@ -1,0 +1,3 @@
+# Netlify reads this file from the published folder, so it works however the site is deployed.
+/api/*  https://punch-gonf.onrender.com/api/:splat  200!
+/*      /index.html                                  200

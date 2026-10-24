@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { LayoutDashboard, LogOut, Trophy, type LucideIcon } from 'lucide-react';
 import { Button } from '../components/Button';
@@ -17,6 +17,7 @@ export function AppShell() {
   const { data: user } = useCurrentUser();
   const logout = useLogout();
   const location = useLocation();
+  const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
 
   // RequireAuth renders this only when a user exists.
@@ -62,7 +63,9 @@ export function AppShell() {
             <Button
               size="small"
               variant="quiet"
-              onClick={() => logout.mutate()}
+              onClick={() =>
+                logout.mutate(undefined, { onSettled: () => navigate('/login', { replace: true }) })
+              }
               loading={logout.isPending}
               aria-label="Log out"
             >
