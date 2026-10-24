@@ -4,7 +4,7 @@ A quiz and rewards app for students. People register, take timed multiple-choice
 
 Built by Daniel Success for the PUNCH NextGen Full-Stack Web Developer assessment.
 
-- **Live site:** https://YOUR-SITE.netlify.app
+- **Live site:** https://punch-quiz-daniel.netlify.app
 - **Demo login:** `demo@example.com` / `DemoPass123` (or the "Explore with the demo account" button). All data is fictitious.
 - **API health check:** https://punch-gonf.onrender.com/api/health
 
