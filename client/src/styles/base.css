@@ -7,10 +7,17 @@
 html {
   -webkit-text-size-adjust: 100%;
   color-scheme: dark;
+  /* Safety net: nothing may widen the page sideways. `clip` (unlike `hidden`)
+     keeps the sticky header working. */
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
   min-height: 100dvh;
   background: var(--ink-900);
   color: var(--text);

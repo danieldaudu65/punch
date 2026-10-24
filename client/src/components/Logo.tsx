@@ -7,7 +7,7 @@ export function Logo({ to = '/' }: { to?: string }) {
       <span className="logo__mark" aria-hidden="true">
         <Zap size={18} fill="currentColor" strokeWidth={2} />
       </span>
-      <span>
+      <span className="logo__text">
         PUNCH <span className="logo__sub">NextGen</span>
       </span>
     </Link>

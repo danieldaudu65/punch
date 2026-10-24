@@ -118,7 +118,16 @@
 
 @media (max-width: 640px) {
   .shell__bar {
-    gap: 12px;
+    gap: 8px;
+  }
+
+  .shell__user {
+    gap: 6px;
+  }
+
+  /* The initial is decorative, so on phones the room goes to the controls */
+  .shell__user .avatar {
+    display: none;
   }
 
   .shell__nav {
@@ -201,5 +210,12 @@
   .tabbar__icon,
   .tabbar__label {
     position: relative;
+  }
+}
+
+/* Very small phones: keep the logo mark only */
+@media (max-width: 360px) {
+  .shell .logo__text {
+    display: none;
   }
 }

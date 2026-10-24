@@ -385,3 +385,81 @@
 .sound-toggle[aria-pressed='false'] {
   color: var(--text-faint);
 }
+
+/* ───────── Confirm dialog ───────── */
+
+.confirm {
+  width: min(400px, calc(100vw - 32px));
+  max-width: none;
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius-lg);
+  background: var(--ink-800);
+  color: var(--text);
+  box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.7);
+}
+
+.confirm[open] {
+  animation: confirm-pop 220ms var(--ease-out);
+}
+
+.confirm::backdrop {
+  background: rgb(8 6 26 / 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.confirm[open]::backdrop {
+  animation: confirm-fade 200ms ease;
+}
+
+.confirm__body {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 28px 24px 22px;
+  text-align: center;
+}
+
+.confirm__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  background: rgb(229 38 46 / 0.14);
+  border: 1px solid rgb(229 38 46 / 0.4);
+  color: var(--punch-bright);
+}
+
+.confirm__title {
+  font-size: var(--text-xl);
+}
+
+.confirm__message {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  max-width: 32ch;
+}
+
+.confirm__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  margin-top: 14px;
+}
+
+@keyframes confirm-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+
+@keyframes confirm-fade {
+  from {
+    opacity: 0;
+  }
+}

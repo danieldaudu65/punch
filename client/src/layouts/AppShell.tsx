@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { LayoutDashboard, LogOut, Trophy, type LucideIcon } from 'lucide-react';
 import { Button } from '../components/Button';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Logo } from '../components/Logo';
 import { SoundToggle } from '../components/SoundToggle';
 import { useCurrentUser, useLogout } from '../features/auth/auth.api';
@@ -18,6 +20,7 @@ export function AppShell() {
   const logout = useLogout();
   const location = useLocation();
   const navigate = useNavigate();
+  const [confirmingLogout, setConfirmingLogout] = useState(false);
   const reduceMotion = useReducedMotion();
 
   // RequireAuth renders this only when a user exists.
@@ -63,17 +66,37 @@ export function AppShell() {
             <Button
               size="small"
               variant="quiet"
-              onClick={() =>
-                logout.mutate(undefined, { onSettled: () => navigate('/login', { replace: true }) })
-              }
-              loading={logout.isPending}
+              onClick={() => {
+                playSound('tap');
+                setConfirmingLogout(true);
+              }}
               aria-label="Log out"
+              aria-haspopup="dialog"
             >
               <LogOut size={16} aria-hidden="true" />
             </Button>
           </div>
         </div>
       </header>
+
+      <ConfirmDialog
+        open={confirmingLogout}
+        title="Log out?"
+        message="You will need to sign in again to take quizzes and earn XP."
+        confirmLabel="Log out"
+        cancelLabel="Stay"
+        icon={<LogOut size={22} />}
+        busy={logout.isPending}
+        onCancel={() => setConfirmingLogout(false)}
+        onConfirm={() =>
+          logout.mutate(undefined, {
+            onSettled: () => {
+              setConfirmingLogout(false);
+              navigate('/login', { replace: true });
+            },
+          })
+        }
+      />
 
       <main className="shell__main">
         {/* A short fade between pages, keyed by the URL. */}
